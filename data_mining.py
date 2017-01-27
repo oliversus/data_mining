@@ -6,6 +6,7 @@ import scipy
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 from __future__ import division
+import pandas as pd
 
 iris = datasets.load_iris()
 
@@ -87,6 +88,7 @@ x = np.linspace(norm.ppf(0.01, loc=loc, scale=scale), norm.ppf(0.99, loc=loc, sc
 ax.plot(x, norm.pdf(x, loc=loc, scale=scale), '-', lw=5, alpha=0.6, label='norm pdf')
 
 # categorical attributes
+
 sepal_length_categ = np.array(["Long" if x >= 7 else "Short" for x in sepal_length])
 n = len(sepal_length_categ)
 p = sum(sepal_length_categ == "Long") / n
@@ -98,7 +100,17 @@ var_n_long_sepal_length = n * p * (1 - p) # more interesting, the variance in n 
 # so, 95% CI of mean (mean +- 2 std)
 CI_n_long_sepal_length = [n_long_sepal_length - (math.sqrt(var_n_long_sepal_length) * x) for x in (2, -2)]
 
-
+# multivariate bernoulli variable (i.e. more than two outcomes)
+bins = [4.3, 5.2, 6.1, 7.0, 7.9]
+group_names = ["Very Short", "Short", "Long", "Very Long"]
+sepal_length_multivariate = pd.cut(sepal_length, bins, labels=group_names)
+# mean values
+means = sepal_length_multivariate.describe().freqs
+means_values = [0.3, 0.333, 0.287, 0.08]
+P_hat = np.zeros((4,4), dtype=np.float)
+np.fill_diagonal(P_hat, means_values)
+# covariance matrix
+multivar_bernoulli_covmat = P_hat - (means_values * np.transpose(means_values))
 
 
 
